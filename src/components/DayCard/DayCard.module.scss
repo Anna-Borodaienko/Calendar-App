@@ -25,5 +25,9 @@
 
 .info {
   margin-top: 0;
+
+  &_weekend {
+    color: rgba(212, 89, 121, 1);
+  }
 }
 

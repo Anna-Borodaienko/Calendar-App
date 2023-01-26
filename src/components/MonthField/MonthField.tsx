@@ -1,35 +1,45 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import moment from 'moment';
 
 import { DayCard } from '../DayCard/DayCard';
 
 import styles from './MonthField.module.scss';
-import { useDate } from '../../hooks/useDate';
 
-export const MonthField: React.FC = () => {
-  // const [currentDate] = useState<Date>(new Date());
-  const DateMatrix = useDate();
+interface Props {
+  month: number;
+}
 
-  // const year = currentDate.getFullYear();
-  // const month = currentDate.getMonth();
-  // console.table(DateMatrix);
+export const MonthField: React.FC<Props> = ({ month }) => {
+  const setLayout = (month = moment().month()) => {
+    const year = moment().year();
+    const firstDayOfMonth = moment(new Date(year, month, 0)).day();
+    let currentMonthCount = 0 - firstDayOfMonth;
 
-  // const dayInMonth = new Date(year, month, 0).getDate();
+    const matrix = new Array(6).fill([]).map(() => {
+      return new Array(7).fill(null).map(() => {
+        currentMonthCount++;
+        return moment(new Date(year, month, currentMonthCount));
+      });
+    });
+
+    return matrix;
+  };
+
+  const [Days, setDays] = useState(setLayout(month));
+
+  useEffect(() => {
+    setDays(setLayout(month));
+  }, [month]);
 
   return (
     <div className={styles.container}>
-      {DateMatrix.map((row, i) => (
+      {Days.map((row, i) => (
         <React.Fragment key={i}>
           {row.map((day, index) => (
-            <DayCard key={index} day={day} />
+            <DayCard key={index} day={day} month={month} />
           ))}
         </React.Fragment>
       ))}
     </div>
   );
 };
-
-// <div className={styles.container}>
-//   {[...Array(dayInMonth)].map((_item, i) => (
-//     <DayCard item={i + 1} key={i} />
-//   ))}
-// </div>
