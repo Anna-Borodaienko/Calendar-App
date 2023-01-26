@@ -1,0 +1,29 @@
+.card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  min-height: 150px;
+  min-width: 50px;
+  padding: 10px;
+  border: 1px solid rgba(109, 88, 212, 0.8);
+  transition: all 500ms;
+
+  &_active {
+    background-color: rgba(109, 88, 212, 0.4)
+  }
+
+  &_other {
+    opacity: 0.3;
+  }
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.06);
+    transform: scale(1.05);
+    filter: drop-shadow(8px 8px 8px black);
+  }
+}
+
+.info {
+  margin-top: 0;
+}
+
