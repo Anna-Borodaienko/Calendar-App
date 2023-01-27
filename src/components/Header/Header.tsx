@@ -12,28 +12,49 @@ interface Props {
 }
 
 export const Header: React.FC<Props> = ({ month, setMonth }) => {
-  const [pickerIsOpen, setPickerIsOpen] = useState(true);
-  const [pickerValue, setPickerValue] = useState(new Date());
+  const [pickerValue, setPickerValue] = useState(moment(new Date(moment().year(), month, 1)));
+  console.log(month);
 
   const currentDate = moment(new Date(moment().year(), month, 1));
-  const difference = currentDate.diff(pickerValue, 'months');
+  console.log(currentDate);
+
+  const difference = currentDate.diff(
+    moment(new Date(moment(pickerValue).year(), moment(pickerValue).month(), 1)),
+    'months',
+  );
 
   useEffect(() => {
     setMonth(month - difference);
-  }, [difference]);
+  }, [pickerValue]);
+
+  useEffect(() => {
+    if (month !== 0) {
+      localStorage.setItem('currentDate', `${month}`);
+    }
+  }, [month]);
+
+  console.log(month);
+
+  const handleForwardOnMonth = () => {
+    setMonth(month + 1);
+  };
+
+  const handleBackOnMonth = () => {
+    setMonth(month - 1);
+  };
 
   const handlePickerChange = (value: Date) => {
-    setPickerValue(value);
+    setPickerValue(moment(new Date(moment(value).year(), moment(value).month(), 1)));
   };
 
   return (
     <div className={styles.container}>
       <div className={styles.month}>
-        <button className={styles.arrow} onClick={() => setMonth(month - 1)}>
+        <button className={styles.arrow} onClick={handleBackOnMonth}>
           <CircumIcon name="square_chev_left" color="#000" size="40px"></CircumIcon>
         </button>
         <div>{currentDate.format('MMMM YYYY')}</div>
-        <button className={styles.arrow} onClick={() => setMonth(month + 1)}>
+        <button className={styles.arrow} onClick={() => handleForwardOnMonth()}>
           <CircumIcon name="square_chev_right" color="#000" size="40px"></CircumIcon>
         </button>
       </div>
@@ -45,6 +66,8 @@ export const Header: React.FC<Props> = ({ month, setMonth }) => {
         locale={'en-EN'}
         maxDetail={'year'}
         onChange={handlePickerChange}
+        returnValue={'end'}
+        format={'y-MM'}
       />
     </div>
   );

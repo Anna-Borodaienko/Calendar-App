@@ -10,7 +10,7 @@ interface Props {
 }
 
 export const MonthField: React.FC<Props> = ({ month }) => {
-  const setLayout = (month = moment().month()) => {
+  const setLayout = (month: number) => {
     const year = moment().year();
     const firstDayOfMonth = moment(new Date(year, month, 0)).day();
     let currentMonthCount = 0 - firstDayOfMonth;
@@ -28,6 +28,10 @@ export const MonthField: React.FC<Props> = ({ month }) => {
   const [Days, setDays] = useState(setLayout(month));
 
   useEffect(() => {
+    if (localStorage.getItem('currentDate')) {
+      setDays(setLayout(+localStorage.getItem('currentDate')!));
+      return;
+    }
     setDays(setLayout(month));
   }, [month]);
 
