@@ -7,12 +7,8 @@ function App() {
   const [month, setMonth] = useState(moment().month());
 
   useEffect(() => {
-    if (month !== moment().month()) {
-      localStorage.setItem('currentDate', `${month}`);
-    }
-
-    if (localStorage.getItem('currentDate')) {
-      setMonth(+localStorage.getItem('currentDate')!);
+    if (localStorage.getItem('currentMonth')) {
+      setMonth(+localStorage.getItem('currentMonth')!);
     }
   }, []);
 

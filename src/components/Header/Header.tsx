@@ -13,6 +13,7 @@ interface Props {
 
 export const Header: React.FC<Props> = ({ month, setMonth }) => {
   const [pickerValue, setPickerValue] = useState(moment(new Date(moment().year(), month, 1)));
+
   console.log(month);
 
   const currentDate = moment(new Date(moment().year(), month, 1));
@@ -28,12 +29,10 @@ export const Header: React.FC<Props> = ({ month, setMonth }) => {
   }, [pickerValue]);
 
   useEffect(() => {
-    if (month !== 0) {
-      localStorage.setItem('currentDate', `${month}`);
+    if (month !== moment().month()) {
+      localStorage.setItem('currentMonth', `${month}`);
     }
   }, [month]);
-
-  console.log(month);
 
   const handleForwardOnMonth = () => {
     setMonth(month + 1);

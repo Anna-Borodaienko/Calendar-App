@@ -12,8 +12,6 @@ interface Props {
 export const DayCard: React.FC<Props> = ({ day, month }) => {
   const dayIsToday = day.format('dd MM DDDD') === moment().format('dd MM DDDD');
   const otherMonthDays = day.format('M') !== moment(new Date(day.year(), month)).format('M');
-  // console.log(day.format('M'));
-  // console.log(moment(new Date(day.year(), month)).format('M'));
 
   const dayIsWeekend = day.format('dd') === 'Su' || day.format('dd') === 'Sa';
 
