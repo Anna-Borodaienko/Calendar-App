@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React from 'react';
+import React, { useState } from 'react';
 import Modal from 'react-modal';
 import { Formik, Field, Form } from 'formik';
 import CircumIcon from '@klarr-agency/circum-icons-react';
@@ -13,8 +13,16 @@ interface Props {
 import styles from './ModalWindow.module.scss';
 
 export const ModalWindow: React.FC<Props> = ({ modalIsOpen, setIsOpen }) => {
+  const [titleIsEmpty, setTitleIsEmpty] = useState(false);
+
   const closeModal = () => {
     setIsOpen(false);
+  };
+
+  const validateTitle = (title: string) => {
+    if (!title) {
+      setTitleIsEmpty(true);
+    }
   };
 
   return (
@@ -38,53 +46,62 @@ export const ModalWindow: React.FC<Props> = ({ modalIsOpen, setIsOpen }) => {
           date: '',
           beginTime: '',
         }}
-        onSubmit={() => {}}
+        onSubmit={(values) => {
+          console.log(JSON.stringify(values, null, 2));
+        }}
       >
-        <Form className={styles.form}>
-          <label htmlFor="title" className={styles.label}>
-            Title*
-          </label>
-          <Field
-            id="title"
-            name="title"
-            placeholder="Title goes here"
-            className={cn(styles.input, styles.name)}
-          ></Field>
+        {({ validateForm }) => (
+          <Form className={styles.form}>
+            <label htmlFor="title" className={styles.label}>
+              Title*
+            </label>
+            <Field
+              id="title"
+              name="title"
+              placeholder={titleIsEmpty ? 'Title is required!' : 'Title goes here'}
+              className={cn(styles.input, styles.name, { titleIsEmpty: styles.alarm })}
+              validate={validateTitle}
+            />
 
-          <label htmlFor="description" className={styles.label}></label>
-          <Field
-            id="description"
-            name="description"
-            placeholder="Description"
-            className={cn(styles.input, styles.description)}
-            as="textarea"
-            rows="4"
-          ></Field>
+            <label htmlFor="description" className={styles.label}></label>
+            <Field
+              id="description"
+              name="description"
+              placeholder="Description"
+              className={cn(styles.input, styles.description)}
+              as="textarea"
+              rows="4"
+            />
 
-          <div className={styles.time}>
-            <div className={styles.date}>
-              <label htmlFor="date" className={styles.label}>
-                Date*
-              </label>
-              <Field id="date" name="date" className={cn(styles.input, styles.day)}></Field>
+            <div className={styles.time}>
+              <div className={styles.date}>
+                <label htmlFor="date" className={styles.label}>
+                  Date*
+                </label>
+                <Field id="date" name="date" className={cn(styles.input, styles.day)} />
+              </div>
+
+              <div className={styles.date}>
+                <label htmlFor="beginTime" className={styles.label}>
+                  Begin time
+                </label>
+                <Field
+                  id="beginTime"
+                  name="beginTime"
+                  placeholder="--:--"
+                  className={cn(styles.input, styles.begin)}
+                />
+              </div>
             </div>
-
-            <div className={styles.date}>
-              <label htmlFor="beginTime" className={styles.label}>
-                Begin time
-              </label>
-              <Field
-                id="beginTime"
-                name="beginTime"
-                placeholder="--:--"
-                className={cn(styles.input, styles.begin)}
-              ></Field>
-            </div>
-          </div>
-          <button type="submit" className={styles.button}>
-            Save
-          </button>
-        </Form>
+            <button
+              type="submit"
+              className={styles.button}
+              onClick={() => validateForm().then(() => console.log('blah'))}
+            >
+              Save
+            </button>
+          </Form>
+        )}
       </Formik>
     </Modal>
   );

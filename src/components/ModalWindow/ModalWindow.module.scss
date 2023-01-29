@@ -77,3 +77,11 @@
  margin-right: 0;
  margin-left: auto;
 }
+
+.alarm::placeholder {
+  color: red;
+  font-weight: bolder;
+  font-size: large;
+  opacity: 1;
+}
+

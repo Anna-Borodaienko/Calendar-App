@@ -4,44 +4,25 @@ import CircumIcon from '@klarr-agency/circum-icons-react';
 import DatePicker from 'react-date-picker';
 
 import styles from './Header.module.scss';
-import moment from 'moment';
+import moment, { Moment } from 'moment';
 
 interface Props {
-  month: number;
-  setMonth: (month: number) => void;
+  selectedDate: Moment;
+  setDate: (date: Moment) => void;
   setIsOpen: (value: boolean) => void;
 }
 
-export const Header: React.FC<Props> = ({ month, setMonth, setIsOpen }) => {
-  const [pickerValue, setPickerValue] = useState(moment(new Date(moment().year(), month, 1)));
-
-  const currentDate = moment(new Date(moment().year(), month, 1));
-
-  const difference = currentDate.diff(
-    moment(new Date(moment(pickerValue).year(), moment(pickerValue).month(), 1)),
-    'months',
-  );
-
-  useEffect(() => {
-    setMonth(month - difference);
-  }, [pickerValue]);
-
-  useEffect(() => {
-    if (month !== moment().month()) {
-      localStorage.setItem('currentMonth', `${month}`);
-    }
-  }, [month]);
-
-  const handleForwardOnMonth = () => {
-    setMonth(month + 1);
+export const Header: React.FC<Props> = ({ selectedDate, setDate, setIsOpen }) => {
+  const forwardMonth = () => {
+    setDate(selectedDate.clone().add(1, 'M'));
   };
 
-  const handleBackOnMonth = () => {
-    setMonth(month - 1);
+  const backwardMonth = () => {
+    setDate(selectedDate.clone().subtract(1, 'M'));
   };
 
-  const handlePickerChange = (value: Date) => {
-    setPickerValue(moment(new Date(moment(value).year(), moment(value).month(), 1)));
+  const selectDate = (newDate: Date) => {
+    setDate(moment(newDate));
   };
 
   const handleOpenModal = () => {
@@ -56,11 +37,11 @@ export const Header: React.FC<Props> = ({ month, setMonth, setIsOpen }) => {
 
       <div className={styles.date}>
         <div className={styles.month}>
-          <button className={styles.arrow} onClick={handleBackOnMonth}>
+          <button className={styles.arrow} onClick={backwardMonth}>
             <CircumIcon name="square_chev_left" color="#000" size="40px"></CircumIcon>
           </button>
-          <div>{currentDate.format('MMMM YYYY')}</div>
-          <button className={styles.arrow} onClick={() => handleForwardOnMonth()}>
+          <div>{selectedDate.format('MMMM YYYY')}</div>
+          <button className={styles.arrow} onClick={() => forwardMonth()}>
             <CircumIcon name="square_chev_right" color="#000" size="40px"></CircumIcon>
           </button>
         </div>
@@ -71,7 +52,7 @@ export const Header: React.FC<Props> = ({ month, setMonth, setIsOpen }) => {
           calendarAriaLabel={'Calendar'}
           locale={'en-EN'}
           maxDetail={'year'}
-          onChange={handlePickerChange}
+          onChange={selectDate}
           returnValue={'end'}
           format={'y-MM'}
         />

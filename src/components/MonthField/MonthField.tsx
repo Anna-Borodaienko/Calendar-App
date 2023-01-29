@@ -1,46 +1,38 @@
-import React, { useEffect, useState } from 'react';
-import moment from 'moment';
+import React from 'react';
+import { Moment } from 'moment';
 
 import { DayCard } from '../DayCard/DayCard';
 
 import styles from './MonthField.module.scss';
 
 interface Props {
-  month: number;
+  selectedDate: Moment;
 }
 
-export const MonthField: React.FC<Props> = ({ month }) => {
-  const setLayout = (month: number) => {
-    const year = moment().year();
-    const firstDayOfMonth = moment(new Date(year, month, 0)).day();
-    let currentMonthCount = 0 - firstDayOfMonth;
+export const MonthField: React.FC<Props> = ({ selectedDate }) => {
+  const getLayout = () => {
+    const calendar = [];
+    const startDay = selectedDate.clone().startOf('month').startOf('isoWeek');
+    const endDay = selectedDate.clone().endOf('month').endOf('isoWeek');
 
-    const matrix = new Array(6).fill([]).map(() => {
-      return new Array(7).fill(null).map(() => {
-        currentMonthCount++;
-        return moment(new Date(year, month, currentMonthCount));
-      });
-    });
+    let date = startDay.clone().subtract(1, 'day');
 
-    return matrix;
-  };
-
-  const [Days, setDays] = useState(setLayout(month));
-
-  useEffect(() => {
-    if (localStorage.getItem('currentDate')) {
-      setDays(setLayout(+localStorage.getItem('currentDate')!));
-      return;
+    while (date.isBefore(endDay, 'day')) {
+      const week = Array(7)
+        .fill(0)
+        .map(() => date.add(1, 'day').clone());
+      calendar.push(week);
     }
-    setDays(setLayout(month));
-  }, [month]);
+
+    return calendar;
+  };
 
   return (
     <div className={styles.container}>
-      {Days.map((row, i) => (
+      {getLayout().map((row, i) => (
         <React.Fragment key={i}>
           {row.map((day, index) => (
-            <DayCard key={index} day={day} month={month} />
+            <DayCard key={index} day={day} month={selectedDate.month()} />
           ))}
         </React.Fragment>
       ))}
