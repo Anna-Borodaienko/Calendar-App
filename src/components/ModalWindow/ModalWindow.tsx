@@ -1,29 +1,70 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import Modal from 'react-modal';
-import { Formik, Field, Form } from 'formik';
 import CircumIcon from '@klarr-agency/circum-icons-react';
-import cn from 'classnames';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
+import { Box, TextField, Button, InputLabel } from '@mui/material';
+import moment from 'moment';
 
 interface Props {
   modalIsOpen: boolean;
   setIsOpen: (value: boolean) => void;
+  addTask: (values: Task) => void;
+  editedTask: Task;
+  editTask: (task: Task, values: Task) => void;
 }
 
 import styles from './ModalWindow.module.scss';
+import { Task } from '../Models/Task';
 
-export const ModalWindow: React.FC<Props> = ({ modalIsOpen, setIsOpen }) => {
-  const [titleIsEmpty, setTitleIsEmpty] = useState(false);
-
+export const ModalWindow: React.FC<Props> = ({
+  modalIsOpen,
+  setIsOpen,
+  addTask,
+  editedTask,
+  editTask,
+}) => {
   const closeModal = () => {
     setIsOpen(false);
   };
 
-  const validateTitle = (title: string) => {
-    if (!title) {
-      setTitleIsEmpty(true);
+  const validationSchema = yup.object({
+    title: yup.string().required('Title is required'),
+    description: yup.string(),
+    date: yup.date().required('Date is required'),
+    beginTime: yup.string(),
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      title: '',
+      description: '',
+      date: '',
+      beginTime: '00:00',
+      createdAt: moment(),
+    },
+    validationSchema: validationSchema,
+    onSubmit: (values: Task) => {
+      console.error(values);
+      if (!editedTask.createdAt) {
+        addTask(values);
+        formik.resetForm();
+      }
+      editTask(editedTask, values);
+      formik.resetForm();
+    },
+  });
+
+  const setInitialValuesIfEdit = () => {
+    if (editedTask.createdAt) {
+      formik.setValues({ ...editedTask });
     }
   };
+
+  useEffect(() => {
+    setInitialValuesIfEdit();
+  }, [editedTask]);
 
   return (
     <Modal
@@ -34,75 +75,83 @@ export const ModalWindow: React.FC<Props> = ({ modalIsOpen, setIsOpen }) => {
       ariaHideApp={false}
     >
       <div className={styles.header}>
-        <p className={styles.title}>Add new idea item</p>
+        <div className={styles.title}>
+          <p>{editedTask.createdAt ? 'Edit idea item' : 'Add new idea item'}</p>
+          <p className={styles.subtitle}>
+            {editedTask.updatedAt
+              ? `Updated at ${editedTask.updatedAt}`
+              : `Created at ${editedTask.createdAt}`}
+          </p>
+        </div>
+
         <button onClick={closeModal} className={styles.close}>
           <CircumIcon name="square_remove" color="#000" size="30px"></CircumIcon>
         </button>
       </div>
-      <Formik
-        initialValues={{
-          title: '',
-          description: '',
-          date: '',
-          beginTime: '',
-        }}
-        onSubmit={(values) => {
-          console.log(JSON.stringify(values, null, 2));
-        }}
-      >
-        {({ validateForm }) => (
-          <Form className={styles.form}>
-            <label htmlFor="title" className={styles.label}>
-              Title*
-            </label>
-            <Field
-              id="title"
-              name="title"
-              placeholder={titleIsEmpty ? 'Title is required!' : 'Title goes here'}
-              className={cn(styles.input, styles.name, { titleIsEmpty: styles.alarm })}
-              validate={validateTitle}
+
+      <form className={styles.form} onSubmit={formik.handleSubmit}>
+        <Box sx={{ mb: 3 }} component="form">
+          <InputLabel>Title*</InputLabel>
+          <TextField
+            fullWidth
+            id="title"
+            name="title"
+            placeholder="Title goes here"
+            value={formik.values.title}
+            onChange={formik.handleChange}
+            error={formik.touched.title && Boolean(formik.errors.title)}
+            helperText={formik.touched.title && formik.errors.title}
+          />
+        </Box>
+        <Box sx={{ mb: 2 }} component="form">
+          <TextField
+            fullWidth
+            id="description"
+            name="description"
+            label="Description"
+            multiline
+            rows={4}
+            value={formik.values.description}
+            onChange={formik.handleChange}
+          />
+        </Box>
+        <Box
+          sx={{
+            mb: 2,
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}
+          component="form"
+        >
+          <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+            <InputLabel>Date*</InputLabel>
+            <TextField
+              id="date"
+              name="date"
+              type="date"
+              value={formik.values.date}
+              onChange={formik.handleChange}
+              error={formik.touched.date && Boolean(formik.errors.date)}
+              helperText={formik.touched.date && formik.errors.date}
             />
-
-            <label htmlFor="description" className={styles.label}></label>
-            <Field
-              id="description"
-              name="description"
-              placeholder="Description"
-              className={cn(styles.input, styles.description)}
-              as="textarea"
-              rows="4"
+          </Box>
+          <Box>
+            <InputLabel>Begin Time</InputLabel>
+            <TextField
+              id="beginTime"
+              name="beginTime"
+              type="time"
+              value={formik.values.beginTime}
+              onChange={formik.handleChange}
             />
+          </Box>
+        </Box>
 
-            <div className={styles.time}>
-              <div className={styles.date}>
-                <label htmlFor="date" className={styles.label}>
-                  Date*
-                </label>
-                <Field id="date" name="date" className={cn(styles.input, styles.day)} />
-              </div>
-
-              <div className={styles.date}>
-                <label htmlFor="beginTime" className={styles.label}>
-                  Begin time
-                </label>
-                <Field
-                  id="beginTime"
-                  name="beginTime"
-                  placeholder="--:--"
-                  className={cn(styles.input, styles.begin)}
-                />
-              </div>
-            </div>
-            <button
-              type="submit"
-              className={styles.button}
-              onClick={() => validateForm().then(() => console.log('blah'))}
-            >
-              Save
-            </button>
-          </Form>
-        )}
-      </Formik>
+        <Button type="submit" sx={{ display: 'block', mr: 1, ml: 'auto' }} variant="contained">
+          Save
+        </Button>
+      </form>
     </Modal>
   );
 };

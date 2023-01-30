@@ -3,10 +3,12 @@ import { MonthField } from './components/MonthField/MonthField';
 import { Header } from './components/Header/Header';
 import moment, { Moment } from 'moment';
 import { ModalWindow } from './components/ModalWindow/ModalWindow';
+import { Task } from './components/Models/Task';
 
 function App() {
   const [selectedDate, setSelectedDate] = useState(moment());
   const [modalIsOpen, setIsOpen] = useState(false);
+  const [editedTask, setEditedTask] = useState<any>({});
 
   useEffect(() => {
     if (localStorage.getItem('selectedDate')) {
@@ -16,16 +18,65 @@ function App() {
 
   const changeDate = (newDate: Moment) => {
     setSelectedDate(newDate);
-    if (newDate.month() !== moment().month()) {
-      localStorage.setItem('selectedDate', `${newDate}`);
+    localStorage.setItem('selectedDate', `${newDate}`);
+  };
+
+  const addTask = (values: Task) => {
+    const task = {
+      title: values.title,
+      description: values.description || '',
+      date: values.date,
+      beginTime: values.beginTime || '00:00',
+      createdAt: moment(),
+    };
+    if (!localStorage.getItem(`${task.date}`)) {
+      localStorage.setItem(`${task.date}`, JSON.stringify(Array(task)));
+      setIsOpen(false);
+      return;
     }
+    const tasks = JSON.parse(localStorage.getItem(`${task.date}`)!);
+    tasks.push(task);
+    localStorage.setItem(`${task.date}`, JSON.stringify(tasks));
+    setIsOpen(false);
+  };
+
+  const openTask = (task: Task) => {
+    setEditedTask(task);
+    setIsOpen(true);
+  };
+
+  const editTask = (task: Task, values: Task) => {
+    openTask(task);
+    let dayTasks = JSON.parse(localStorage.getItem(`${task.date}`)!);
+
+    dayTasks = dayTasks.filter((item: Task) => item.createdAt !== task.createdAt);
+
+    const updatedTask = {
+      title: values.title,
+      description: values.description || '',
+      date: values.date,
+      beginTime: values.beginTime || '00:00',
+      createdAt: values.createdAt,
+      updatedAt: moment(),
+    };
+    dayTasks.push(updatedTask);
+    localStorage.setItem(`${task.date}`, JSON.stringify(dayTasks));
+
+    setEditedTask({});
+    setIsOpen(false);
   };
 
   return (
     <div>
       <Header selectedDate={selectedDate} setDate={changeDate} setIsOpen={setIsOpen} />
-      <MonthField selectedDate={selectedDate} />
-      <ModalWindow modalIsOpen={modalIsOpen} setIsOpen={setIsOpen} />
+      <MonthField selectedDate={selectedDate} openTask={openTask} />
+      <ModalWindow
+        modalIsOpen={modalIsOpen}
+        setIsOpen={setIsOpen}
+        addTask={addTask}
+        editedTask={editedTask}
+        editTask={editTask}
+      />
     </div>
   );
 }

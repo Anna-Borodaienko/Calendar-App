@@ -55,6 +55,7 @@ export const Header: React.FC<Props> = ({ selectedDate, setDate, setIsOpen }) =>
           onChange={selectDate}
           returnValue={'end'}
           format={'y-MM'}
+          defaultActiveStartDate={new Date(selectedDate.year(), selectedDate.month(), 1)}
         />
       </div>
     </header>

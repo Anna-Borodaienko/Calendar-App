@@ -1,15 +1,18 @@
-import React from 'react';
+/* eslint-disable no-unused-vars */
+import React, { useCallback, useEffect } from 'react';
 import { Moment } from 'moment';
 
 import { DayCard } from '../DayCard/DayCard';
 
 import styles from './MonthField.module.scss';
+import { Task } from '../Models/Task';
 
 interface Props {
   selectedDate: Moment;
+  openTask: (item: Task) => void;
 }
 
-export const MonthField: React.FC<Props> = ({ selectedDate }) => {
+export const MonthField: React.FC<Props> = ({ selectedDate, openTask }) => {
   const getLayout = () => {
     const calendar = [];
     const startDay = selectedDate.clone().startOf('month').startOf('isoWeek');
@@ -32,7 +35,7 @@ export const MonthField: React.FC<Props> = ({ selectedDate }) => {
       {getLayout().map((row, i) => (
         <React.Fragment key={i}>
           {row.map((day, index) => (
-            <DayCard key={index} day={day} month={selectedDate.month()} />
+            <DayCard key={index} day={day} month={selectedDate.month()} openTask={openTask} />
           ))}
         </React.Fragment>
       ))}
