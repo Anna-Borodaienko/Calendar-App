@@ -1,10 +1,10 @@
 import { Moment } from 'moment';
 
-export interface Task {
+export interface FormType {
   title: string;
   description: string;
   date: string;
   beginTime: string;
-  createdAt: Moment;
-  updatedAt?: Moment;
+  createdAt?: Moment;
+  uodatedAt?: Moment;
 }

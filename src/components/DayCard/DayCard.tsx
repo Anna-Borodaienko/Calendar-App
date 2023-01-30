@@ -4,25 +4,22 @@ import { TasksList } from '../TasksList/TasksList';
 
 import moment, { Moment } from 'moment';
 import { Card, CardContent, Typography, Container, Grid } from '@mui/material';
-import { Task } from '../Models/Task';
+import { Task } from '../../models/Task';
+import { Day } from '../../models/Day';
 
 interface Props {
-  day: Moment;
-  month: number;
+  day: Day;
   openTask: (item: Task) => void;
 }
 
-export const DayCard: React.FC<Props> = ({ day, month, openTask }) => {
-  const [tasks, setTasks] = useState([]);
-  const dayIsToday = day.format('dd MM DDDD') === moment().format('dd MM DDDD');
-  const otherMonthDays = day.format('M') !== moment(new Date(day.year(), month)).format('M');
-  const dayIsWeekend = day.format('dd') === 'Su' || day.format('dd') === 'Sa';
+export const DayCard: React.FC<Props> = ({ day: dayProps, openTask }) => {
+  const { year, month, day, tasks } = dayProps;
 
-  useEffect(() => {
-    if (localStorage.getItem(`${day.format('YYYY-MM-DD')}`)) {
-      setTasks(JSON.parse(localStorage.getItem(`${day.format('YYYY-MM-DD')}`)!));
-    }
-  }, []);
+  // const [tasks, setTasks] = useState([]);
+  const currentDay = moment(dayProps);
+  const dayIsToday = currentDay.format('dd MM DDDD') === moment().format('dd MM DDDD');
+  const otherMonthDays = currentDay.format('M') !== moment(new Date(year, month)).format('M');
+  const dayIsWeekend = currentDay.format('dd') === 'Su' || currentDay.format('dd') === 'Sa';
 
   return (
     <Grid item xs={1}>
@@ -37,10 +34,6 @@ export const DayCard: React.FC<Props> = ({ day, month, openTask }) => {
           '&:hover': {
             backgroundColor: 'rgba(0, 0, 0, 0.06)',
           },
-          '& .MuiContainer': {
-            padding: '0',
-            margin: '0',
-          },
         }}
       >
         <CardContent>
@@ -52,10 +45,10 @@ export const DayCard: React.FC<Props> = ({ day, month, openTask }) => {
             }}
           >
             <Typography sx={{ color: dayIsWeekend ? 'rgba(212, 89, 121, 1)' : null }}>
-              {day.format('D')}
+              {currentDay.format('D')}
             </Typography>
             <Typography sx={{ color: dayIsWeekend ? 'rgba(212, 89, 121, 1)' : null }}>
-              {day.format('dd')}
+              {currentDay.format('dd')}
             </Typography>
           </Container>
           <Container sx={{ marginTop: '20px', color: 'rgba(109, 88, 212, 1)' }}>

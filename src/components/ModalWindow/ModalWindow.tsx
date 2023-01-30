@@ -17,7 +17,8 @@ interface Props {
 }
 
 import styles from './ModalWindow.module.scss';
-import { Task } from '../Models/Task';
+import { Task } from '../../models/Task';
+import { FormType } from './FormType';
 
 export const ModalWindow: React.FC<Props> = ({
   modalIsOpen,
@@ -47,28 +48,37 @@ export const ModalWindow: React.FC<Props> = ({
       createdAt: moment(),
     },
     validationSchema: validationSchema,
-    onSubmit: (values: Task) => {
+    onSubmit: (values: FormType) => {
       console.error(values);
       if (!editedTask.createdAt) {
-        addTask(values);
+        const task = {
+          title: values.title,
+          description: values.description || '',
+          beginAt: moment(`${values.date} ${values.beginTime}`),
+          createdAt: moment(),
+        };
+        addTask(task);
         formik.resetForm();
         closeModal();
         return;
       }
-      editTask(editedTask, values);
+      const task = {
+        title: values.title,
+        description: values.description || '',
+        beginAt: moment(`${values.date} ${values.beginTime}`),
+        createdAt: moment(),
+        updatedAt: moment(),
+      };
+      editTask(editedTask, task);
       formik.resetForm();
       closeModal();
     },
   });
 
-  const setInitialValuesIfEdit = () => {
+  useEffect(() => {
     if (editedTask.createdAt) {
       formik.setValues({ ...editedTask });
     }
-  };
-
-  useEffect(() => {
-    setInitialValuesIfEdit();
   }, [editedTask]);
 
   return (

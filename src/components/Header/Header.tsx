@@ -25,13 +25,13 @@ export const Header: React.FC<Props> = ({ selectedDate, setDate, setIsOpen }) =>
     setDate(moment(newDate));
   };
 
-  const handleOpenModal = () => {
+  const openModal = () => {
     setIsOpen(true);
   };
 
   return (
     <header className={styles.container}>
-      <button className={styles.arrow} onClick={handleOpenModal}>
+      <button className={styles.arrow} onClick={openModal}>
         <CircumIcon name="square_plus" color="#000" size="40px"></CircumIcon>
       </button>
 

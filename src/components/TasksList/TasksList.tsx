@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React from 'react';
 import { List, ListItem, ListItemText } from '@mui/material';
-import { Task } from '../Models/Task';
+import { Task } from '../../models/Task';
 
 interface Props {
   tasks: Task[];

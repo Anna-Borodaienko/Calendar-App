@@ -3,40 +3,56 @@ import { MonthField } from '../MonthField/MonthField';
 import { Header } from '../Header/Header';
 import moment, { Moment } from 'moment';
 import { ModalWindow } from '../ModalWindow/ModalWindow';
-import { Task } from '../Models/Task';
+import { Task } from '../../models/Task';
+import { Day } from '../../models/Day';
 
 export const CalendarPage: React.FC = () => {
-  const [selectedDate, setSelectedDate] = useState(moment());
+  const [selectedDay, setSelectedDay] = useState<Day>();
   const [modalIsOpen, setIsOpen] = useState(false);
   const [editedTask, setEditedTask] = useState<any>({});
+  const [activeMonthTasks, setActiveMonthTasks] = useState<Task[]>([]);
 
   useEffect(() => {
-    if (localStorage.getItem('selectedDate')) {
-      setSelectedDate(moment(localStorage.getItem('selectedDate')));
+    if (localStorage.getItem('selectedDay')) {
+      setSelectedDay(JSON.parse(localStorage.getItem('selectedDay')!));
     }
   }, []);
 
+  useEffect(() => {
+    const startDay = moment(selectedDay).clone().startOf('month').startOf('isoWeek');
+    const endDay = moment(selectedDay).clone().endOf('month').endOf('isoWeek');
+
+    let date = startDay.clone().subtract(1, 'day');
+    let tasks: Task[] = [];
+
+    while (date.isBefore(endDay, 'day')) {
+      for (let i = 0; i < 7; i++) {
+        date = date.add(1, 'day');
+        if (localStorage.getItem(`${date.format('YYYY-MM-DD')}`)) {
+          const dayTasks = JSON.parse(localStorage.getItem(`${date.format('YYYY-MM-DD')}`)!);
+          for (const day of dayTasks) {
+            tasks.push(day);
+          }
+        }
+      }
+    }
+    setActiveMonthTasks(tasks);
+  }, [selectedDay]);
+
   const changeDate = (newDate: Moment) => {
-    setSelectedDate(newDate);
-    localStorage.setItem('selectedDate', `${newDate}`);
+    setSelectedDay(newDate);
+    localStorage.setItem('selectedDay', `${newDate}`);
   };
 
-  const addTask = (values: Task) => {
-    const task = {
-      title: values.title,
-      description: values.description || '',
-      date: values.date,
-      beginTime: values.beginTime || '00:00',
-      createdAt: moment(),
-    };
-    if (!localStorage.getItem(`${task.date}`)) {
-      localStorage.setItem(`${task.date}`, JSON.stringify(Array(task)));
+  const addTask = (task: Task) => {
+    if (!localStorage.getItem(`${task.beginAt}`)) {
+      localStorage.setItem(`${task.beginAt}`, JSON.stringify(Array(task)));
       setIsOpen(false);
       return;
     }
-    const tasks = JSON.parse(localStorage.getItem(`${task.date}`)!);
+    const tasks = JSON.parse(localStorage.getItem(`${task.beginAt}`)!);
     tasks.push(task);
-    localStorage.setItem(`${task.date}`, JSON.stringify(tasks));
+    localStorage.setItem(`${task.beginAt}`, JSON.stringify(tasks));
     console.log(modalIsOpen);
     setIsOpen(false);
   };
@@ -46,36 +62,31 @@ export const CalendarPage: React.FC = () => {
     setIsOpen(true);
   };
 
-  const editTask = (task: Task, values: Task) => {
-    openTask(task);
-    let dayTasks = JSON.parse(localStorage.getItem(`${task.date}`)!);
+  const editTask = (oldTask: Task, newTask: Task) => {
+    openTask(oldTask);
+    let dayTasks = JSON.parse(localStorage.getItem(`${oldTask.beginAt}`)!);
 
-    dayTasks = dayTasks.filter((item: Task) => item.createdAt !== task.createdAt);
-    localStorage.setItem(`${task.date}`, JSON.stringify(dayTasks));
+    dayTasks = dayTasks.filter((item: Task) => item.createdAt !== oldTask.createdAt);
+    localStorage.setItem(`${oldTask.beginAt}`, JSON.stringify(dayTasks));
 
-    const updatedTask = {
-      ...values,
-      updatedAt: moment(),
-    };
-
-    if (!localStorage.getItem(`${updatedTask.date}`)) {
-      localStorage.setItem(`${updatedTask.date}`, JSON.stringify(Array(updatedTask)));
+    if (!localStorage.getItem(`${newTask.beginAt}`)) {
+      localStorage.setItem(`${newTask.beginAt}`, JSON.stringify(Array(newTask)));
       setIsOpen(false);
       return;
     }
-    const anotherDayTasks = JSON.parse(localStorage.getItem(`${updatedTask.date}`)!);
+    const anotherDayTasks = JSON.parse(localStorage.getItem(`${newTask.beginAt}`)!);
 
-    anotherDayTasks.push(updatedTask);
-    localStorage.setItem(`${updatedTask.date}`, JSON.stringify(anotherDayTasks));
+    anotherDayTasks.push(newTask);
+    localStorage.setItem(`${newTask.beginAt}`, JSON.stringify(anotherDayTasks));
 
     setEditedTask({});
     setIsOpen(false);
   };
 
   const deleteTask = (task: Task) => {
-    let dayTasks = JSON.parse(localStorage.getItem(`${task.date}`)!);
+    let dayTasks = JSON.parse(localStorage.getItem(`${task.beginAt}`)!);
     dayTasks = dayTasks.filter((item: Task) => item.createdAt !== task.createdAt);
-    localStorage.setItem(`${task.date}`, JSON.stringify(dayTasks));
+    localStorage.setItem(`${task.beginAt}`, JSON.stringify(dayTasks));
     setEditedTask({});
     setIsOpen(false);
   };
@@ -83,7 +94,11 @@ export const CalendarPage: React.FC = () => {
   return (
     <div>
       <Header selectedDate={selectedDate} setDate={changeDate} setIsOpen={setIsOpen} />
-      <MonthField selectedDate={selectedDate} openTask={openTask} />
+      <MonthField
+        selectedDay={selectedDay}
+        openTask={openTask}
+        activeMonthTasks={activeMonthTasks}
+      />
       <ModalWindow
         modalIsOpen={modalIsOpen}
         setIsOpen={setIsOpen}
