@@ -79,8 +79,11 @@ export const ModalWindow: React.FC<Props> = ({
           <p>{editedTask.createdAt ? 'Edit idea item' : 'Add new idea item'}</p>
           <p className={styles.subtitle}>
             {editedTask.updatedAt
-              ? `Updated at ${editedTask.updatedAt}`
-              : `Created at ${editedTask.createdAt}`}
+              ? `Updated at ${moment(editedTask.updatedAt).format('YYYY-MM-DD HH:mm')}`
+              : null}
+            {editedTask.createdAt && !editedTask.updatedAt
+              ? `Created at ${moment(editedTask.createdAt).format('YYYY-MM-DD HH:mm')}`
+              : null}
           </p>
         </div>
 

@@ -4,8 +4,8 @@ import { Moment } from 'moment';
 
 import { DayCard } from '../DayCard/DayCard';
 
-import styles from './MonthField.module.scss';
 import { Task } from '../Models/Task';
+import { Grid } from '@mui/material/';
 
 interface Props {
   selectedDate: Moment;
@@ -31,7 +31,7 @@ export const MonthField: React.FC<Props> = ({ selectedDate, openTask }) => {
   };
 
   return (
-    <div className={styles.container}>
+    <Grid container spacing={1} columns={7}>
       {getLayout().map((row, i) => (
         <React.Fragment key={i}>
           {row.map((day, index) => (
@@ -39,6 +39,6 @@ export const MonthField: React.FC<Props> = ({ selectedDate, openTask }) => {
           ))}
         </React.Fragment>
       ))}
-    </div>
+    </Grid>
   );
 };

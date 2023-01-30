@@ -10,10 +10,23 @@ interface Props {
 
 export const TasksList: React.FC<Props> = ({ tasks, openTask }) => {
   return (
-    <List>
+    <List sx={{ margin: '0', padding: '0' }}>
       {tasks.map((item, idx) => (
-        <ListItem key={idx} onClick={() => openTask(item)} disablePadding>
-          <ListItemText>{item.title}</ListItemText>
+        <ListItem
+          key={idx}
+          onClick={() => openTask(item)}
+          disablePadding
+          disableGutters
+          sx={{
+            '&:hover': {
+              backgroundColor: 'rgba(0, 0, 0, 0.06)',
+              borderRadius: '5px',
+            },
+            flexWrap: 'nowrap',
+            fontSize: '10px',
+          }}
+        >
+          <ListItemText sx={{ fontSize: '10px' }}>{item.title.slice(0, 10)}</ListItemText>
         </ListItem>
       ))}
     </List>
