@@ -13,6 +13,7 @@ interface Props {
   addTask: (values: Task) => void;
   editedTask: Task;
   editTask: (task: Task, values: Task) => void;
+  deleteTask: (task: Task) => void;
 }
 
 import styles from './ModalWindow.module.scss';
@@ -24,6 +25,7 @@ export const ModalWindow: React.FC<Props> = ({
   addTask,
   editedTask,
   editTask,
+  deleteTask,
 }) => {
   const closeModal = () => {
     setIsOpen(false);
@@ -50,9 +52,12 @@ export const ModalWindow: React.FC<Props> = ({
       if (!editedTask.createdAt) {
         addTask(values);
         formik.resetForm();
+        closeModal();
+        return;
       }
       editTask(editedTask, values);
       formik.resetForm();
+      closeModal();
     },
   });
 
@@ -150,10 +155,23 @@ export const ModalWindow: React.FC<Props> = ({
             />
           </Box>
         </Box>
+        <Box sx={{ display: 'flex' }}>
+          {editedTask.createdAt && (
+            <Button
+              // type="submit"
+              sx={{ display: 'block', mr: 'auto', ml: 1 }}
+              variant="contained"
+              color="error"
+              onClick={() => deleteTask(editedTask)}
+            >
+              Delete
+            </Button>
+          )}
 
-        <Button type="submit" sx={{ display: 'block', mr: 1, ml: 'auto' }} variant="contained">
-          Save
-        </Button>
+          <Button type="submit" sx={{ display: 'block', mr: 1, ml: 'auto' }} variant="contained">
+            Save
+          </Button>
+        </Box>
       </form>
     </Modal>
   );

@@ -32,6 +32,7 @@ export const CalendarPage: React.FC = () => {
     if (!localStorage.getItem(`${task.date}`)) {
       localStorage.setItem(`${task.date}`, JSON.stringify(Array(task)));
       setIsOpen(false);
+      return;
     }
     const tasks = JSON.parse(localStorage.getItem(`${task.date}`)!);
     tasks.push(task);
@@ -50,18 +51,31 @@ export const CalendarPage: React.FC = () => {
     let dayTasks = JSON.parse(localStorage.getItem(`${task.date}`)!);
 
     dayTasks = dayTasks.filter((item: Task) => item.createdAt !== task.createdAt);
-
-    const updatedTask = {
-      title: values.title,
-      description: values.description || '',
-      date: values.date,
-      beginTime: values.beginTime || '00:00',
-      createdAt: values.createdAt,
-      updatedAt: moment(),
-    };
-    dayTasks.push(updatedTask);
     localStorage.setItem(`${task.date}`, JSON.stringify(dayTasks));
 
+    const updatedTask = {
+      ...values,
+      updatedAt: moment(),
+    };
+
+    if (!localStorage.getItem(`${updatedTask.date}`)) {
+      localStorage.setItem(`${updatedTask.date}`, JSON.stringify(Array(updatedTask)));
+      setIsOpen(false);
+      return;
+    }
+    const anotherDayTasks = JSON.parse(localStorage.getItem(`${updatedTask.date}`)!);
+
+    anotherDayTasks.push(updatedTask);
+    localStorage.setItem(`${updatedTask.date}`, JSON.stringify(anotherDayTasks));
+
+    setEditedTask({});
+    setIsOpen(false);
+  };
+
+  const deleteTask = (task: Task) => {
+    let dayTasks = JSON.parse(localStorage.getItem(`${task.date}`)!);
+    dayTasks = dayTasks.filter((item: Task) => item.createdAt !== task.createdAt);
+    localStorage.setItem(`${task.date}`, JSON.stringify(dayTasks));
     setEditedTask({});
     setIsOpen(false);
   };
@@ -76,6 +90,7 @@ export const CalendarPage: React.FC = () => {
         addTask={addTask}
         editedTask={editedTask}
         editTask={editTask}
+        deleteTask={deleteTask}
       />
     </div>
   );
