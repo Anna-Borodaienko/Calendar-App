@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/Anna-Borodaienko/Calendar-App/static/css/main.ba4d9a4c.css",
+    "main.js": "/Anna-Borodaienko/Calendar-App/static/js/main.632c4016.js",
+    "static/js/787.713a1642.chunk.js": "/Anna-Borodaienko/Calendar-App/static/js/787.713a1642.chunk.js",
+    "index.html": "/Anna-Borodaienko/Calendar-App/index.html",
+    "main.ba4d9a4c.css.map": "/Anna-Borodaienko/Calendar-App/static/css/main.ba4d9a4c.css.map",
+    "main.632c4016.js.map": "/Anna-Borodaienko/Calendar-App/static/js/main.632c4016.js.map",
+    "787.713a1642.chunk.js.map": "/Anna-Borodaienko/Calendar-App/static/js/787.713a1642.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.ba4d9a4c.css",
+    "static/js/main.632c4016.js"
+  ]
+}
