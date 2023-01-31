@@ -7,7 +7,7 @@
 * Eslint
 * Moment
 
-## [DEMO LINK](https://anna-borodaienko.github.io/Calendar-App/)
+## [DEMO LINK](https://soft-frangollo-38ca2a.netlify.app/)
 
 Calendar App with ToDo List
 
