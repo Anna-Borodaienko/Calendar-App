@@ -4,29 +4,25 @@ import CircumIcon from '@klarr-agency/circum-icons-react';
 import DatePicker from 'react-date-picker';
 
 import styles from './Header.module.scss';
-import moment, { Moment } from 'moment';
+import { Month } from '../../models/Month';
 
 interface Props {
-  selectedDate: Moment;
-  setDate: (date: Moment) => void;
-  setIsOpen: (value: boolean) => void;
+  selectedMonth: Month;
+  selectNewMonth: (month: Month) => void;
+  openModal: () => void;
 }
 
-export const Header: React.FC<Props> = ({ selectedDate, setDate, setIsOpen }) => {
+export const Header: React.FC<Props> = ({ selectedMonth, selectNewMonth, openModal }) => {
   const forwardMonth = () => {
-    setDate(selectedDate.clone().add(1, 'M'));
+    selectNewMonth(selectedMonth.increment());
   };
 
   const backwardMonth = () => {
-    setDate(selectedDate.clone().subtract(1, 'M'));
+    selectNewMonth(selectedMonth.decrement());
   };
 
   const selectDate = (newDate: Date) => {
-    setDate(moment(newDate));
-  };
-
-  const openModal = () => {
-    setIsOpen(true);
+    selectNewMonth(Month.fromDate(newDate));
   };
 
   return (
@@ -40,8 +36,8 @@ export const Header: React.FC<Props> = ({ selectedDate, setDate, setIsOpen }) =>
           <button className={styles.arrow} onClick={backwardMonth}>
             <CircumIcon name="square_chev_left" color="#000" size="40px"></CircumIcon>
           </button>
-          <div>{selectedDate.format('MMMM YYYY')}</div>
-          <button className={styles.arrow} onClick={() => forwardMonth()}>
+          <div>{selectedMonth.format('MMMM YYYY')}</div>
+          <button className={styles.arrow} onClick={forwardMonth}>
             <CircumIcon name="square_chev_right" color="#000" size="40px"></CircumIcon>
           </button>
         </div>
@@ -55,7 +51,7 @@ export const Header: React.FC<Props> = ({ selectedDate, setDate, setIsOpen }) =>
           onChange={selectDate}
           returnValue={'end'}
           format={'y-MM'}
-          defaultActiveStartDate={new Date(selectedDate.year(), selectedDate.month(), 1)}
+          defaultActiveStartDate={new Date(selectedMonth.year, selectedMonth.month, 1)}
         />
       </div>
     </header>

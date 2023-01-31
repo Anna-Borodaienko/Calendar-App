@@ -12,7 +12,7 @@ interface Props {
   setIsOpen: (value: boolean) => void;
   addTask: (values: Task) => void;
   editedTask: Task;
-  editTask: (task: Task, values: Task) => void;
+  editTask: (oldTask: Task, newTask: Task) => void;
   deleteTask: (task: Task) => void;
 }
 
@@ -49,7 +49,6 @@ export const ModalWindow: React.FC<Props> = ({
     },
     validationSchema: validationSchema,
     onSubmit: (values: FormType) => {
-      console.error(values);
       if (!editedTask.createdAt) {
         const task = {
           title: values.title,
@@ -77,7 +76,11 @@ export const ModalWindow: React.FC<Props> = ({
 
   useEffect(() => {
     if (editedTask.createdAt) {
-      formik.setValues({ ...editedTask });
+      formik.setValues({
+        ...editedTask,
+        date: editedTask.beginAt.format('YYYY-MM-DD'),
+        beginTime: editedTask.beginAt.format('HH:mm'),
+      });
     }
   }, [editedTask]);
 
